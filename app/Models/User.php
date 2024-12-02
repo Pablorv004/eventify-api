@@ -21,6 +21,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'profile_picture',
+        'activated',
+        'email_confirmed',
+        'deleted',
     ];
 
     /**
@@ -40,5 +45,24 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'password' => 'hashed',
     ];
+
+    // Method to verify if user is user
+    public function isUser()
+    {
+        return $this->role === 'u';
+    }
+
+    // Method to verify if user is organizer
+    public function isOrganizer()
+    {
+        return $this->role === 'o';
+    }
+
+    // Define the relationship with events
+    public function events()
+    {
+        return $this->hasMany(Event::class, 'organizer_id');
+    }
 }
