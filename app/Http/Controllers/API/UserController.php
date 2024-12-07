@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use App\Models\User;
 
@@ -9,12 +10,12 @@ use App\Models\User;
 class UserController extends BaseController
 {
     /**
-     * Display a listing of the resource.
+     * Retrieves a list of users.
      */
     public function index()
     {
         $users = User::all();
-        return $this->sendResponse($users->toArray(), 'Users retrieved successfully.');
+        return $this->sendResponse(UserResource::collection($users), 'Users retrieved successfully.');
     }
 
     /**
@@ -34,11 +35,17 @@ class UserController extends BaseController
     }
 
     /**
-     * Display the specified resource.
+     * Retrieve the specified user.
      */
     public function show(string $id)
     {
-        //
+        $user = User::find($id);
+
+        if (is_null($user)) {
+            return $this->sendError('User not found.');
+        }
+
+        return $this->sendResponse(new UserResource($user), 'User retrieved successfully.');
     }
 
     /**

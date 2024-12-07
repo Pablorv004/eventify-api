@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
-use App\Models\Event;
 use Illuminate\Http\Request;
+use App\Http\Resources\EventResource;
+use App\Models\Event;
 
-class EventController extends Controller
+class EventController extends BaseController
 {
     /**
      * Display a listing of the resource.
@@ -34,9 +35,10 @@ class EventController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Event $event)
+    public function show(int $id)
     {
-        //
+        $event = Event::find($id);
+        return $this->sendResponse(new EventResource($event), 'Event retrieved successfully.');
     }
 
     /**
