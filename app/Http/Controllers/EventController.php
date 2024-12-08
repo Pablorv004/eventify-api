@@ -13,15 +13,16 @@ class EventController extends Controller
      */
     public function index()
     {
-        //
+        // TODO: Implement show events list
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Event $event = null)
     {
-        //
+        $categories = Category::all();
+        return view('events.form', compact('categories', 'event'));
     }
 
     /**

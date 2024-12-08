@@ -27,5 +27,7 @@ Route::controller(RegisterController::class)->group(function () {
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::resource('users', UserController::class);
-    Route::resource('events', EventController::class);
+    // Route::resource('events', EventController::class);
 });
+
+Route::resource('events', EventController::class);
