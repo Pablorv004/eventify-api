@@ -11,7 +11,7 @@
 
                 <div class="card-body">
                     <form method="POST"
-                        action="{{ $event ? url('api/events/' . $event->id) : url('api/events/store') }}"
+                        action="{{ $event ? route('events.update', $event->id) : route('events.store') }}"
                         enctype="multipart/form-data">
                         @csrf
                         @if($event)
@@ -197,10 +197,12 @@
                                 <button type="submit" class="btn btn-primary">
                                     {{ $event ? __('Update Event') : __('Create Event') }}
                                 </button>
+                                <a href="{{ url()->previous() }}" class="btn btn-secondary ml-2">
+                                    {{ __('Cancel') }}
+                                </a>
                             </div>
                         </div>
                     </form>
-
                 </div>
             </div>
         </div>

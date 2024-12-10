@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Resources\EventResource;
 use Validator;
 use App\Models\Event;
+use App\Rules\ValidEvent;
 use App\Models\Category;
 
 class EventController extends BaseController
@@ -15,7 +16,8 @@ class EventController extends BaseController
      */
     public function index()
     {
-        //
+        $events = Event::all();
+        return $this->sendResponse(EventResource::collection($events), 'Events retrieved successfully.');
     }
 
     /**
@@ -31,7 +33,31 @@ class EventController extends BaseController
      */
     public function store(Request $request)
     {
-        //
+        $input = $request->all();
+        $validator = $this->validateEvent($input);
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors());
+        }
+
+        $imageName = $this->handleImageUpload($request);
+
+        $event = new Event();
+        $event->fill($request->only([
+            'title',
+            'description',
+            'category_id',
+            'location',
+            'start_date',
+            'end_date',
+            'latitude',
+            'longitude',
+            'max_attendees',
+            'price'
+        ]));
+        $event->image_url = $imageName;
+        $event->save();
+
+        return $this->sendResponse(new EventResource($event), 'Event created successfully.');
     }
 
     /**
@@ -58,40 +84,13 @@ class EventController extends BaseController
     {
         $event = Event::find($id);
         $input = $request->all();
-        // Values that we want to update
-        $validator = Validator::make($input, [
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'category_id' => 'required|numeric',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'location' => 'required|string|max:255',
-            'latitude' => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
-            'max_attendees' => 'required|integer|min:1',
-            'price' => 'required|numeric|min:0',
-            'image_url' => 'nullable|string|max:2048',
-        ]);
-
+        $validator = $this->validateEvent($input);
         if ($validator->fails()) {
             return $this->sendError('Validation Error.', $validator->errors());
         }
 
-        // Image handling
-        $imageName = null;
+        $imageName = $this->handleImageUpload($request, $event->id) ?? $event->image_url;
 
-        if ($request->hasFile('image_file')) {
-            $image = $request->file('image_file');
-            $imageName = 'event-image-' . $event->id . '.' . $image->getClientOriginalExtension();
-
-            // Save image to public/images/events
-            $image->move(public_path('images/events'), $imageName);
-        } else {
-            // Maintain image if no new image is uploaded
-            $imageName = $event->image_url;
-        }
-
-        // Event update
         $event->fill($request->only([
             'title',
             'description',
@@ -113,8 +112,38 @@ class EventController extends BaseController
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Event $event)
+    public function destroy(int $id)
     {
-        //
+        $event = Event::find($id);
+        $event->delete();
+        return $this->sendResponse([], 'Event deleted successfully.');
+    }
+
+    private function validateEvent($input)
+    {
+        return Validator::make($input, [
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'category_id' => 'required|numeric',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'location' => 'required|string|max:255',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
+            'max_attendees' => 'required|integer|min:1',
+            'price' => 'required|numeric|min:0',
+            'image_url' => 'nullable|string|max:2048',
+        ]);
+    }
+
+    private function handleImageUpload(Request $request, $eventId = null)
+    {
+        if ($request->hasFile('image_file')) {
+            $image = $request->file('image_file');
+            $imageName = 'event-image-' . ($eventId ?? time()) . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images/events'), $imageName);
+            return $imageName;
+        }
+        return null;
     }
 }
