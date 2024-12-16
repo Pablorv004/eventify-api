@@ -16,26 +16,9 @@ class EventController extends Controller
      */
     public function index(Request $request)
     {
-        $api = new APIEventController();
-        $eventsResponse = $api->index();
-        $events = json_decode($eventsResponse->getContent())->data;
-        $events = collect($events)->map(function ($eventData) {
-            return new Event((array) $eventData);
-        });
-        $currentCategory = $request->input('category', 'organizer');
-        $page = $request->input('page', 1);
-        if ($currentCategory == 'organizer') {
-            $events = Event::where('organizer_id', Auth::user()->id)->where('deleted', 0)->paginate(5, ['*'], 'page', $page);
-        } else {
-            $category = Category::where('name', ucfirst($currentCategory))->first();
-            if ($category) {
-                $events = Event::where('category_id', $category->id)->where('deleted', 0)->paginate(5, ['*'], 'page', $page);
-            } else {
-                $events = collect();
-            }
-        }
-        $categories = Category::all();
-        return view('events.index')->with('events', $events)->with('categories', $categories)->with('currentCategory', $currentCategory);
+        $events = Event::all();
+
+        return view('events.index', compact('events'));
     }
 
     /**
