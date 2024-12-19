@@ -35,7 +35,15 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $api = new APIEventController();
+        $response = $api->store($request);
+
+        if ($response->getData()->success == 'success') {
+            return redirect('/events')->with('success', 'Event created successfully');
+        } else {
+            $errorMessage = json_decode($response->getContent())->message ?? 'Failed to create event. Please check all parameters and try again.';
+            return redirect()->back()->withErrors($response->getData()->message);
+        }
     }
 
     /**

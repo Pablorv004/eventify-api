@@ -21,7 +21,7 @@ Route::get('/', function () {
 });
 
 Route::get('/home', function () {
-    return view('home');
+    return view('welcome');
 }) ->name('home');
 //Auth routes
 //TODO: Call functions to API

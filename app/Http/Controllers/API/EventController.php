@@ -55,6 +55,7 @@ class EventController extends BaseController
             'price'
         ]));
         $event->image_url = $imageName;
+        $event->organizer_id = auth()->user()->id;
         $event->save();
 
         return $this->sendResponse(new EventResource($event), 'Event created successfully.');
@@ -144,6 +145,6 @@ class EventController extends BaseController
             $image->move(public_path('images/events'), $imageName);
             return $imageName;
         }
-        return null;
+        return 'event-placeholder.png';
     }
 }
