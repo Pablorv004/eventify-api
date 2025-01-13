@@ -137,7 +137,7 @@
                                     @endif
 
                                     @if(Auth::user()->role == 'u')
-                                        <a class="dropdown-item" href="{{ route('user.index') }}">
+                                        <a class="dropdown-item" href="{{ route('events.index') }}">
                                             {{ __('Events') }}
                                         </a>
                                     @endif

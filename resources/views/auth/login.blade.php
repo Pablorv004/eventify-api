@@ -4,6 +4,8 @@
 <div class="container">
     <div class="row justify-content-center py-4">
         <div class="col-md-8">
+            @include('partials.errors')
+            @include('partials.messages')
             <div class="card">
                 <div class="card-header">{{ __('Login') }}</div>
 

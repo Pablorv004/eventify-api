@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
 
 class RegisterController extends Controller
 {
@@ -30,6 +31,14 @@ class RegisterController extends Controller
      */
     protected $redirectTo = '/home';
 
+
+    /**
+     * Show the registration form.
+     */
+    public function showRegistrationForm()
+    {
+        return view('auth.register');
+    }
     /**
      * Create a new controller instance.
      *
@@ -68,5 +77,20 @@ class RegisterController extends Controller
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
+    }
+
+    /**
+     * Handle a registration request for the application. Uses the API.
+     */
+    public function register(Request $request)
+    {
+        $apiRegisterController = new \App\Http\Controllers\API\RegisterController();
+        $response = $apiRegisterController->register($request);
+
+        if ($response->getStatusCode() == 200) {
+            return redirect('/login')->with('success', 'User registered successfully.');
+        } else {
+            return redirect()->back()->withErrors($response->getData()->message);
+        }
     }
 }

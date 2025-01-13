@@ -5,15 +5,20 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Event;
+use App\Http\Controllers\API\EventController as APIEventController;
+use Illuminate\Support\Facades\Auth;
+
 
 class EventController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // TODO: Implement show events list
+        $events = Event::all();
+
+        return view('events.index', compact('events'));
     }
 
     /**
@@ -30,7 +35,15 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $api = new APIEventController();
+        $response = $api->store($request);
+
+        if ($response->getData()->success == 'success') {
+            return redirect('/events')->with('success', 'Event created successfully');
+        } else {
+            $errorMessage = json_decode($response->getContent())->message ?? 'Failed to create event. Please check all parameters and try again.';
+            return redirect()->back()->withErrors($response->getData()->message);
+        }
     }
 
     /**
@@ -53,16 +66,26 @@ class EventController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, int $id)
     {
-        //
+        $api = new APIEventController();
+        $response = $api->update($request, $id);
+        
+        if ($response->getData()->success == 'success') {
+            return redirect('/events')->with('success', 'Event updated successfully');
+        } else {
+            $errorMessage = json_decode($response->getContent())->message ?? 'Failed to update event. Please check all parameters and try again.';
+            return redirect()->back()->withErrors($response->getData()->message);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Event $event)
     {
-        //
+        $api = new APIEventController();
+        $api->destroy($event->id);
+        return back()->with('success', 'Event deleted successfully');
     }
 }
