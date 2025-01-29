@@ -44,18 +44,6 @@
 
   **We highly recommend to use Postman for testing endpoints**
 
-### 🟢 Logout User
-- **Endpoint:** `/logout`
-- **Method:** `POST`
-- **Description:** Logs out a user.
-- **Parameters:** None
-- **Output Data Type:** JSON
-- **Output Codes:**
-  | Code | Description               |
-  |------|---------------------------|
-  | 200  | User logged out successfully |
-
-  **We highly recommend to use Postman for testing endpoints**
 
 ### 🔵 Get Users
 - **Endpoint:** `/users`
